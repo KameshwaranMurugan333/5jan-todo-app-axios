@@ -7,16 +7,26 @@ export const AddTodos = (props) => {
 
     const [title, setTitle] = React.useState("");
     const [compDate, setCompDate] = React.useState("");
+    const [isError, setIsError] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(false);
+
     const navigate = useNavigate();
 
     const addTodo = () => {
+        setIsLoading(true);
         axios.post("https://63b6427158084a7af3ad6bd9.mockapi.io/todos", {
             todo_title: title,
             is_completed: false,
             todo_date: compDate
         }).then(res => {
             console.log(res.data);
+            setIsError(false);
             navigate(AllRoutes.allTodos)
+        }).catch(err => {
+            console.log(err);
+            setIsError(true);
+        }).finally(err => {
+            setIsLoading(false);
         })
     }
 
@@ -26,6 +36,7 @@ export const AddTodos = (props) => {
         <input type={"text"} value={title} onChange={(e) => setTitle(e.target.value)} placeholder={"Todo Title"} />
         <input type={"date"} value={compDate} onChange={(e) => setCompDate(e.target.value)} placeholder={"Completion Date"} />
 
-        <button onClick={addTodo}>Add Todo</button>
+        <button disabled={isLoading} onClick={addTodo}>{isLoading ? "Adding Todo..." : "Add Todo"}</button>
+        {!isLoading && isError && <p>Opps! Something went wrong, Unable to add Todo</p>}
     </div>
 }
